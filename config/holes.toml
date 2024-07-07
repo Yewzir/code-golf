@@ -1276,7 +1276,7 @@ preamble = '''
 ['Hexagonal Spiral']
 experiment = 1223
 category = 'Art'
-synopsis = 'Draw a cool hexagonal spiral. TODO: Better hole description.'
+synopsis = 'Draw a cool hexagonal spiral. TODO:'
 preamble = '''
 <p>
     The "hexagonal spiral" ASCII art represents a series of connected hexagons
