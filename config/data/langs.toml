@@ -958,26 +958,23 @@ example = '''
 '''
 
 [Kotlin]
-args       = [ '/usr/bin/kotlin', '-' ]
+args       = [ '/usr/local/bin/kotlin', '-e', '$code' ]
+env        = [ 'JAVA_HOME=/opt/java/openjdk' ]
 experiment = 151
 size       = '0 MiB'
 version    = '2.0.20'
 website    = 'https://kotlinlang.org'
 example    = '''
-fun main(args: Array<String>) {
-    // Printing
-    println("Hello, World!");
-    
-    // Looping
-    for (i in 0..9) {
-        println(i);
-    }
-    
-    // Accessing arguments
-    for (arg in args) {
-        println(arg);
-    }
-}
+// Printing
+println("Hello, World!")
+
+// Looping
+for (i in 0..9)
+    println(i)
+
+// Accessing arguments
+for (arg in args)
+    println(arg)
 '''
 
 [Lisp]
