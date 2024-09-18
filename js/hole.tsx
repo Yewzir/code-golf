@@ -1,5 +1,5 @@
 import { EditorView }   from './_codemirror';
-import diffTable        from './_diff';
+import diffView         from './_diff';
 import { $, $$, comma } from './_util';
 import {
     init, langs, hole, setSolution,
@@ -7,6 +7,8 @@ import {
     ReadonlyPanelsData, setCodeForLangAndSolution, getCurrentSolutionCode,
     initDeleteBtn, initCopyJSONBtn, initOutputDiv, getScorings, replaceUnprintablesInOutput,
     updateLocalStorage,
+    ctrlEnter,
+    getLastSubmittedCode,
 } from './_hole-common';
 
 const editor = new EditorView({
@@ -16,6 +18,8 @@ const editor = new EditorView({
         const code = tr.state.doc.toString();
         const scorings: {total: {byte?: number, char?: number}, selection?: {byte?: number, char?: number}} = getScorings(tr, editor);
         const scoringKeys = ['byte', 'char'] as const;
+
+        $('main')?.classList.toggle('lastSubmittedCode', code === getLastSubmittedCode());
 
         function formatScore(scoring: any) {
             return scoringKeys
@@ -51,7 +55,9 @@ $('#restoreLink').onclick = e => {
 };
 
 // Wire submit to clicking a button and a keyboard shortcut.
-$('#runBtn').onclick = () => submit(editor, updateReadonlyPanels);
+const closuredSubmit = () => submit(editor, updateReadonlyPanels);
+$('#runBtn').onclick = closuredSubmit;
+window.onkeydown = ctrlEnter(closuredSubmit);
 
 initCopyJSONBtn($('#copy'));
 initDeleteBtn($('#deleteBtn'), langs);
@@ -83,7 +89,7 @@ function updateReadonlyPanels(data: ReadonlyPanelsData) {
     $('#out div').innerHTML = replaceUnprintablesInOutput($('#out div').innerHTML);
 
     const ignoreCase = JSON.parse($('#case-fold').innerText);
-    const diff = diffTable(hole, data.Exp, data.Out, data.Argv, ignoreCase);
+    const diff = diffView(hole, data.Exp, data.Out, data.Argv, ignoreCase, data.MultisetDelimiter, data.ItemDelimiter);
     $('#diff-content').replaceChildren(diff);
     $('#diff').classList.toggle('hide', !diff);
 }

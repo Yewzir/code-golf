@@ -67,7 +67,9 @@ BEGIN
         earned := earn(earned, 'bird-is-the-word', user_id); END IF;
 
     -- ☕ Caffeinated
-    IF langs_for_hole @> '{java,javascript}' THEN
+    SELECT COUNT(*) >= 2 INTO found FROM UNNEST(langs_for_hole)
+     WHERE unnest IN ('civet', 'java', 'javascript');
+    IF found THEN
         earned := earn(earned, 'caffeinated', user_id); END IF;
 
     -- 🎳 COBOWL
@@ -85,6 +87,10 @@ BEGIN
     -- 🏥 Emergency Room
     IF hole = '𝑒' AND lang = 'r' THEN
         earned := earn(earned, 'emergency-room', user_id); END IF;
+
+    -- 😈 Evil Scheme
+    IF hole IN ('evil-numbers', 'evil-numbers-long') AND lang = 'scheme' THEN
+        earned = earn(earned, 'evil-scheme', user_id); END IF;
 
     -- 🐟 Fish ’n’ Chips
     IF hole = 'poker' AND lang = 'fish' THEN
@@ -116,7 +122,7 @@ BEGIN
 
     -- 🐑 Mary Had a Little Lambda
     SELECT COUNT(*) >= 3 INTO found FROM UNNEST(langs_for_hole)
-     WHERE unnest IN ('clojure', 'coconut', 'haskell', 'lisp');
+     WHERE unnest IN ('clojure', 'coconut', 'haskell', 'lisp', 'scheme');
     IF hole = 'λ' AND found THEN
         earned := earn(earned, 'mary-had-a-little-lambda', user_id); END IF;
 
@@ -199,6 +205,8 @@ BEGIN
     IF holes >=  90 THEN earned := earn(earned, 'right-on',                   user_id); END IF;
     IF holes >=  99 THEN earned := earn(earned, 'neunundneunzig-luftballons', user_id); END IF;
     IF holes >= 100 THEN earned := earn(earned, 'centenarian',                user_id); END IF;
+    IF holes >= 107 THEN earned := earn(earned, 'busy-beaver',                user_id); END IF;
+    IF holes >= 111 THEN earned := earn(earned, 'disappearing-act',           user_id); END IF;
 
     RETURN earned;
 END;

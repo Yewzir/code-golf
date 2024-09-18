@@ -1,10 +1,24 @@
+[['golfer/profile']]
+id      = 'followed-golfers-in-feed'
+name    = 'Show Followed Golfers in Feed'
+default = true
+
+[[hole]]
+id   = 'lang-picker-style'
+name = 'Language Picker Style'
+options = [
+    { id = 'icon-label', name = 'Icon & Label' },
+    { id = 'icon',       name = 'Icon Only' },
+    { id = 'label',      name = 'Label Only' },
+]
+
 [[hole]]
 id   = 'multi-window-layout'
 name = 'Multi-Window Layout (WIP)'
 
 [[hole]]
 id      = 'show-whitespace'
-name    = 'Show Whitespace'
+name    = 'Show Whitespace in Editor'
 default = true
 
 [[home]]

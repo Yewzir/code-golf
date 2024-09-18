@@ -25,14 +25,18 @@ func golferGET(w http.ResponseWriter, r *http.Request) {
 	golfer := session.GolferInfo(r)
 
 	location := time.UTC
+	followedGolfersInFeed := true
 	if golfer := session.Golfer(r); golfer != nil {
 		location = golfer.Location()
+		followedGolfersInFeed =
+			golfer.Settings["golfer/profile"]["followed-golfers-in-feed"].(bool)
 	}
 
 	data := struct {
-		Connections []oauth.Connection
-		Followers   []string
-		Following   []struct {
+		CategoryOverview map[string]map[string]int
+		Connections      []oauth.Connection
+		Followers        []string
+		Following        []struct {
 			Bytes, Chars, Rank int
 			Country            config.NullCountry
 			Name               string
@@ -42,13 +46,16 @@ func golferGET(w http.ResponseWriter, r *http.Request) {
 		Trophies       map[string]map[string]int
 		Wall           []row
 	}{
-		Connections:    oauth.GetConnections(db, golfer.ID, true),
-		Langs:          config.LangList,
-		OAuthProviders: oauth.Providers,
-		Trophies:       map[string]map[string]int{},
-		Wall:           make([]row, 0, limit),
+		CategoryOverview: map[string]map[string]int{"bytes": {}, "chars": {}},
+		Connections:      oauth.GetConnections(db, golfer.ID, true),
+		Langs:            config.LangList,
+		OAuthProviders:   oauth.Providers,
+		Trophies:         map[string]map[string]int{},
+		Wall:             make([]row, 0, limit),
 	}
 
+	// Note we hide followers as well as following if the bool is false.
+	// Maybe this means the setting is badly named?
 	rows, err := db.Query(
 		`WITH data AS (
 		 -- Cheevos
@@ -58,7 +65,9 @@ func golferGET(w http.ResponseWriter, r *http.Request) {
 		           NULL::lang lang,
 		           user_id
 		      FROM trophies
-		     WHERE user_id = ANY(following($1, $2))
+		     WHERE CASE WHEN $1 THEN user_id = ANY(following($2, $3))
+		                        ELSE user_id = $2
+		           END
 		 UNION ALL
 		 -- Follows
 		    SELECT followed     date,
@@ -67,7 +76,7 @@ func golferGET(w http.ResponseWriter, r *http.Request) {
 		           NULL::lang   lang,
 		           follower_id  user_id
 		      FROM follows
-		     WHERE followee_id = $1
+		     WHERE followee_id = $2 AND $1
 		 UNION ALL
 		 -- Holes
 		    SELECT MAX(submitted) date,
@@ -76,11 +85,14 @@ func golferGET(w http.ResponseWriter, r *http.Request) {
 		           lang           lang,
 		           user_id
 		      FROM solutions
-		     WHERE user_id = ANY(following($1, $2))
+		     WHERE CASE WHEN $1 THEN user_id = ANY(following($2, $3))
+		                        ELSE user_id = $2
+		           END
 		  GROUP BY user_id, hole, lang
 		) SELECT cheevo, date, login, hole, lang
 		    FROM data JOIN users ON id = user_id
-		ORDER BY date DESC, login LIMIT $3`,
+		ORDER BY date DESC, login LIMIT $4`,
+		followedGolfersInFeed,
 		golfer.ID,
 		golfer.FollowLimit(),
 		limit,
@@ -119,6 +131,37 @@ rows:
 
 	if err := rows.Err(); err != nil {
 		panic(err)
+	}
+
+	var categories []struct {
+		Category, Scoring string
+		Points            int
+	}
+	if err := db.Select(
+		&categories,
+		`WITH max_points_per_hole AS (
+		    SELECT DISTINCT ON (hole, scoring) hole, scoring, points
+		      FROM rankings
+		     WHERE user_id = $1
+		  ORDER BY hole, scoring, points DESC
+		) SELECT $2::hstore->hole::text category,
+		         ROUND(AVG((points)))   points,
+		         scoring                scoring
+		    FROM max_points_per_hole
+		GROUP BY scoring, category`,
+		golfer.ID,
+		config.HoleCategoryHstore,
+	); err != nil {
+		panic(err)
+	}
+
+	// Ensure we have no missing categories.
+	for _, hole := range config.HoleList {
+		data.CategoryOverview["bytes"][hole.Category] = 0
+		data.CategoryOverview["chars"][hole.Category] = 0
+	}
+	for _, cat := range categories {
+		data.CategoryOverview[cat.Scoring][cat.Category] = cat.Points
 	}
 
 	rows, err = db.Query(

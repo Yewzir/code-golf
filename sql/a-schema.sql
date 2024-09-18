@@ -1,21 +1,23 @@
 CREATE EXTENSION citext;
+CREATE EXTENSION hstore;
 
 CREATE TYPE cheevo AS ENUM (
     '0xdead', 'aged-like-fine-wine', 'alchemist', 'archivist',
     'assembly-required', 'bakers-dozen', 'big-brother', 'biohazard',
     'bird-is-the-word', 'black-box-testing', 'blackjack', 'bullseye',
-    'caffeinated', 'centenarian', 'cobowl', 'cunning-linguist',
-    'dammit-janet', 'different-strokes', 'dont-panic',
-    'elephpant-in-the-room', 'emergency-room', 'fish-n-chips', 'fore',
-    'forty-winks', 'go-forth', 'gone-in-60-holes', 'happy-birthday-code-golf',
-    'happy-go-lucky', 'hello-world', 'hextreme-agony', 'inception',
-    'independence-day', 'interview-ready', 'its-over-9000', 'jeweler',
-    'just-kidding', 'like-comment-subscribe', 'marathon-runner',
-    'mary-had-a-little-lambda', 'may-the-4ᵗʰ-be-with-you',
-    'my-god-its-full-of-stars', 'neunundneunzig-luftballons', 'off-the-grid',
-    'omniglot', 'omniglutton', 'ouroboros', 'pangramglot', 'patches-welcome',
-    'phileas-fogg', 'pi-day', 'polyglot', 'polyglutton', 'real-programmers',
-    'right-on', 'rtfm', 'rule-34', 'slowcoach', 'smörgåsbord', 'solve-quine',
+    'busy-beaver', 'caffeinated', 'centenarian', 'cobowl', 'cunning-linguist',
+    'dammit-janet', 'different-strokes', 'disappearing-act', 'dont-panic',
+    'double-slit-experiment', 'elephpant-in-the-room', 'emergency-room',
+    'evil-scheme', 'fish-n-chips', 'fore', 'forty-winks', 'go-forth',
+    'gone-in-60-holes', 'happy-birthday-code-golf', 'happy-go-lucky',
+    'hello-world', 'hextreme-agony', 'inception', 'independence-day',
+    'interview-ready', 'its-over-9000', 'jeweler', 'just-kidding',
+    'like-comment-subscribe', 'marathon-runner', 'mary-had-a-little-lambda',
+    'may-the-4ᵗʰ-be-with-you', 'my-god-its-full-of-stars',
+    'neunundneunzig-luftballons', 'off-the-grid', 'omniglot', 'omniglutton',
+    'ouroboros', 'pangramglot', 'patches-welcome', 'phileas-fogg', 'pi-day',
+    'polyglot', 'polyglutton', 'real-programmers', 'right-on', 'rm-rf',
+    'rtfm', 'rule-34', 'slowcoach', 'smörgåsbord', 'solve-quine',
     'sounds-quite-nice', 'takeout', 'the-watering-hole', 'tim-toady', 'tl-dr',
     'twelvetide', 'twenty-kiloleagues', 'under-pressure', 'up-to-eleven',
     'vampire-byte', 'x86'
@@ -42,15 +44,15 @@ CREATE TYPE hole AS ENUM (
     'lucky-numbers', 'lucky-tickets', 'mahjong', 'maze', 'medal-tally',
     'morse-decoder', 'morse-encoder', 'musical-chords', 'n-queens',
     'niven-numbers', 'niven-numbers-long', 'number-spiral', 'odious-numbers',
-    'odious-numbers-long', 'ordinal-numbers', 'pangram-grep',
-    'pascals-triangle', 'pernicious-numbers', 'pernicious-numbers-long',
-    'poker', 'prime-numbers', 'prime-numbers-long', 'proximity-grid',
-    'qr-decoder', 'quine', 'recamán', 'repeating-decimals',
-    'reverse-polish-notation', 'reversi', 'rijndael-s-box',
-    'rock-paper-scissors-spock-lizard', 'roman-to-arabic', 'rule-110',
-    'seven-segment', 'si-units', 'sierpiński-triangle', 'smith-numbers',
-    'spelling-numbers', 'star-wars-opening-crawl', 'sudoku', 'sudoku-v2',
-    'ten-pin-bowling', 'time-distance', 'tongue-twisters',
+    'odious-numbers-long', 'ordinal-numbers', 'palindromemordnilap',
+    'pangram-grep', 'pascals-triangle', 'pernicious-numbers',
+    'pernicious-numbers-long', 'poker', 'polyominoes', 'prime-numbers',
+    'prime-numbers-long', 'proximity-grid', 'qr-decoder', 'quine', 'recamán',
+    'repeating-decimals', 'reverse-polish-notation', 'reversi',
+    'rijndael-s-box', 'rock-paper-scissors-spock-lizard', 'roman-to-arabic',
+    'rule-110', 'seven-segment', 'si-units', 'sierpiński-triangle',
+    'smith-numbers', 'spelling-numbers', 'star-wars-opening-crawl', 'sudoku',
+    'sudoku-v2', 'ten-pin-bowling', 'time-distance', 'tongue-twisters',
     'transpose-sentence', 'united-states', 'vampire-numbers',
     'van-eck-sequence', 'zeckendorf-representation', 'zodiac-signs', 'γ', 'λ',
     'π', 'τ', 'φ', '√2', '𝑒'
@@ -62,12 +64,13 @@ CREATE TYPE keymap AS ENUM ('default', 'vim');
 
 CREATE TYPE lang AS ENUM (
     'assembly', 'awk', 'bash', 'basic', 'berry', 'brainfuck', 'c', 'c-sharp',
-    'clojure',  'cpp', 'cobol', 'coconut', 'crystal', 'd', 'dart', 'elixir',
-    'f-sharp', 'factor', 'fish', 'forth', 'fortran', 'go', 'golfscript',
-    'haskell', 'hexagony', 'j', 'janet', 'java', 'javascript', 'julia', 'k',
-    'lisp', 'lua', 'nim', 'ocaml', 'pascal', 'perl', 'php', 'powershell',
-    'prolog', 'python', 'r', 'raku', 'rockstar', 'ruby', 'rust', 'sed', 'sql',
-    'swift', 'tcl', 'tex', 'v', 'viml', 'wren', 'zig'
+    'civet', 'clojure',  'cpp', 'cobol', 'coconut', 'crystal', 'd', 'dart',
+    'elixir', 'f-sharp', 'factor', 'fish', 'forth', 'fortran', 'go',
+    'golfscript', 'haskell', 'hexagony', 'j', 'janet', 'java', 'javascript',
+    'jq', 'julia', 'k', 'lisp', 'lua', 'nim', 'ocaml', 'pascal', 'perl',
+    'php', 'powershell', 'prolog', 'python', 'r', 'raku', 'rockstar', 'ruby',
+    'rust', 'scheme', 'sed', 'sql', 'swift', 'tcl', 'tex', 'v', 'viml',
+    'wren', 'zig'
 );
 
 CREATE TYPE medal AS ENUM ('unicorn', 'diamond', 'gold', 'silver', 'bronze');
@@ -82,6 +85,7 @@ CREATE TABLE discord_records (
     hole    hole NOT NULL,
     lang    lang NOT NULL,
     message text NOT NULL,
+    channel text NOT NULL,
     PRIMARY KEY (hole, lang)
 );
 

@@ -87,7 +87,7 @@ target      = 3
 [['Hole/Lang Specific']]
 name        = 'Caffeinated'
 emoji       = '☕'
-description = 'Solve any hole in both Java and JavaScript.'
+description = 'Solve any hole in any two of Civet, Java, or JavaScript.'
 
 [['Hole/Lang Specific']]
 name        = 'COBOWL'
@@ -108,6 +108,11 @@ description = 'Solve any hole in PHP.'
 name        = 'Emergency Room'
 emoji       = '🏥'
 description = 'Solve <a href=/𝑒#r>𝑒 in R</a>.'
+
+[['Hole/Lang Specific']]
+name        = 'Evil Scheme'
+emoji       = '😈'
+description = 'Solve <a href=/evil-numbers#scheme>Evil Numbers</a> or <a href=/evil-numbers-long>Evil Numbers (Long)</a> in Scheme.'
 
 [['Hole/Lang Specific']]
 name        = 'Fish ’n’ Chips'
@@ -149,7 +154,7 @@ description = 'Solve any hole in both J and K.'
 [['Hole/Lang Specific']]
 name        = 'Mary Had a Little Lambda'
 emoji       = '🐑'
-description = 'Solve <a href=/λ>λ</a> in any three of <a href=/λ#clojure>Clojure</a>, <a href=/λ#coconut>Coconut</a>, <a href=/λ#haskell>Haskell</a>, or <a href=/λ#lisp>Lisp</a>.'
+description = 'Solve <a href=/λ>λ</a> in any three of <a href=/λ#clojure>Clojure</a>, <a href=/λ#coconut>Coconut</a>, <a href=/λ#haskell>Haskell</a>, <a href=/λ#lisp>Lisp</a>, or <a href=/λ#scheme>Scheme</a>'
 target      = 3
 
 [['Hole/Lang Specific']]
@@ -205,12 +210,17 @@ description = '<a href=/golfer/settings>Add a bio</a> to your profile.'
 [[Miscellaneous]]
 name        = 'Black-box Testing'
 emoji       = '🧪'
-description = 'Solve an <a href=/ideas>experimental hole</a> or language.'
+description = 'Solve an <a href=/ideas>experimental hole</a>. Or solve any hole in an experimental language.'
 
 [[Miscellaneous]]
 name        = 'Different Strokes'
 emoji       = '🌈'
 description = 'Solve any hole using different bytes and chars solutions.'
+
+[[Miscellaneous]]
+name        = 'Double-slit Experiment'
+emoji       = '🔦'
+description = 'Solve an <a href=/ideas>experimental hole</a> in an experimental language.'
 
 [[Miscellaneous]]
 name        = 'Polyglot'
@@ -240,6 +250,11 @@ target      = 48
 name        = 'Real Programmers'
 emoji       = '🦋'
 description = '<a href=//xkcd.com/378/>Real programmers</a> solve any hole in VimL while using the Vim keymap.'
+
+[[Miscellaneous]]
+name        = 'rm -rf'
+emoji       = '🗑️'
+description = 'Delete a solution.'
 
 [[Miscellaneous]]
 name        = 'RTFM'
@@ -369,6 +384,18 @@ name        = 'Centenarian'
 emoji       = '💯'
 description = 'Solve your hundredth hole.'
 target      = 100
+
+[['Total Holes']]
+name        = 'Busy Beaver'
+emoji       = '🦫'
+description = 'Solve your <a href=//oeis.org/A060843>one hundred and seventh</a> hole.'
+target      = 107
+
+[['Total Holes']]
+name        = 'Disappearing Act'
+emoji       = '🪄'
+description = 'Solve your <a href=//tolkiengateway.net/wiki/Bilbo%27s_Farewell_Party>eleventy-first</a> hole.'
+target      = 111
 
 # TODO
 # [['Total Holes']]

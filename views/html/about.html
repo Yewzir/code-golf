@@ -9,8 +9,9 @@
 </div>
 {{ end }}
 
+<header id=page-header><h1>About</h1></header>
+
 <main>
-    <h1>About</h1>
     <dl>
         <dt>Do I need to log in to play?
         <dd>
@@ -51,22 +52,25 @@
                         <th>Follow Limit
                         <td>{{ .Data.FollowLimit }}
                         <td>{{ .Data.FollowLimitSponsor }}
+                    <tr>
+                        <th>Solution Notes
+                        <td>No
+                        <td>Yes
             </table>
 
         <dt>What languages are supported?
         <dd id=langs>
+        {{ $seenExp := false }}
         {{ range .Data.Langs }}
-            <section>
-                <header>
+            {{ if and .Experiment (not $seenExp) }}
+                {{ $seenExp = true }}
+                <p>Experimental languages:</p>
+            {{ end }}
+                <a href="{{ .Website }}" title="{{ .Name }} - {{ .Version }}">
                     {{ svg .ID }}
                     <h2>{{ .Name }}</h2>
-                    {{ .Size }}
-                </header>
-                <div>{{ .Version }}</div>
-                <a href="{{ .Website }}">
-                    {{ trimPrefix (trimPrefix .Website "https://") "www." }}
+                    <span>{{ .Version }}</span>
                 </a>
-            </section>
         {{ end }}
             <p>
                 If you'd like to see another language added then raise an
@@ -75,6 +79,11 @@
         <dd>
             Yes. Only STDOUT is checked against the solution, STDERR is
             however shown back to you to ease debugging.
+            
+        <dt>Is trailing whitespace ignored?
+        <dd>
+            Trailing whitespace is trimmed from each line and the entire
+            output, except when solving <a href=quine>Quine</a>.
 
         <dt>How are arguments passed to my program?
         <dd>

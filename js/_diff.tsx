@@ -1,4 +1,5 @@
 import * as Diff from 'diff';
+import { $ } from './_util';
 
 interface DiffPos {
     left: number;
@@ -6,7 +7,45 @@ interface DiffPos {
     isLastDiff: boolean;
 }
 
-export default (hole: string, exp: string, out: string, argv: string[], ignoreCase: boolean) => {
+export default (hole: string, exp: string, out: string, argv: string[], ignoreCase: boolean, multisetDelimiter: string, itemDelimiter: string) => {
+    const provideItemwiseDiff = !multisetDelimiter && itemDelimiter;
+    const isLinesDiffChecked = Boolean($('#diffKindSettings input[value="lines"]:checked'));
+    return provideItemwiseDiff ?
+        <div>
+            <div id='diffKindSettings'>
+                <label><input type="radio" name="diff_kind" value="items" checked={!isLinesDiffChecked ? true : undefined}></input> Items</label>
+                <label><input type="radio" name="diff_kind" value="lines" checked={isLinesDiffChecked ? true : undefined}></input> Lines</label>
+            </div>
+            {linesDiff(hole, exp, out, argv, ignoreCase)}
+            {itemsDiff(exp, out, itemDelimiter)}
+        </div>
+        : linesDiff(hole, exp, out, argv, ignoreCase);
+};
+
+function itemsDiff(exp: string, out: string, itemDelimiter: string) {
+    const diff = new Map<string, number>();
+    for (const x of exp.split(itemDelimiter)){
+        diff.set(x, (diff.get(x) ?? 0) - 1);
+    }
+    for (const x of out.split(itemDelimiter)){
+        diff.set(x, (diff.get(x) ?? 0) + 1);
+    }
+    const diffItems = [...diff.entries()].map(([x, count]) => ({x, count, absCount: Math.abs(count)}));
+    const neg = diffItems.filter(x => x.count < 0).map(x => <span title={x.absCount === 1 ? '' : `${x.absCount}×`}>{x.x}</span>);
+    const pos = diffItems.filter(x => x.count > 0).map(x => <span title={x.absCount === 1 ? '' : `${x.absCount}×`}>{x.x}</span>);
+    return neg.length > 0 || pos.length > 0 ? <table id="itemsDiff">
+        <thead>
+            <th>Expected</th>
+            <th>Output</th>
+        </thead>
+        <tr>
+            <td><div class="neg">{neg}</div></td>
+            <td><div class="pos">{pos}</div></td>
+        </tr>
+    </table> : '';
+}
+
+function linesDiff(hole: string, exp: string, out: string, argv: string[], ignoreCase: boolean) {
     if (stringsEqual(exp, out, ignoreCase)) return '';
 
     // Show args? Exclude holes with one big argument like QR Decoder.
@@ -14,13 +53,13 @@ export default (hole: string, exp: string, out: string, argv: string[], ignoreCa
 
     const {rows, maxLineNum} = diffHTMLRows(hole, exp, out, argv, ignoreCase, isArgDiff);
 
-    return <table>
+    return <table id="linesDiff">
         {makeCols(isArgDiff, maxLineNum, argv)}
         <thead>
             {isArgDiff ? <th class="right">Args</th> : <th/>}
-            <th>Output</th>
-            {isArgDiff ? null : <th/>}
             <th>Expected</th>
+            {isArgDiff ? null : <th/>}
+            <th>Output</th>
         </thead>
         {rows}
     </table>;
@@ -161,7 +200,7 @@ function diffHTMLRows(hole: string, exp: string, out: string, argv: string[], ig
         right: 1,
         isLastDiff: false,
     };
-    const changes = getLineChanges(out, exp, ignoreCase, isArgDiff);
+    const changes = getLineChanges(exp, out, ignoreCase, isArgDiff);
     let pendingChange = null;
     for (let i = 0; i < changes.length; i++) {
         const change = changes[i];

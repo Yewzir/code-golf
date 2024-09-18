@@ -17,7 +17,7 @@ func golferCancelDeletePOST(w http.ResponseWriter, r *http.Request) {
 		session.Golfer(r).ID,
 	)
 
-	http.Redirect(w, r, "/golfer/settings", http.StatusSeeOther)
+	http.Redirect(w, r, "/golfer/settings/delete-account", http.StatusSeeOther)
 }
 
 // POST /golfer/delete
@@ -27,7 +27,7 @@ func golferDeletePOST(w http.ResponseWriter, r *http.Request) {
 		session.Golfer(r).ID,
 	)
 
-	http.Redirect(w, r, "/golfer/settings", http.StatusSeeOther)
+	http.Redirect(w, r, "/golfer/settings/delete-account", http.StatusSeeOther)
 }
 
 // GET /golfer/settings
@@ -61,13 +61,23 @@ func golferSettingsGET(w http.ResponseWriter, r *http.Request) {
 		Value:    data.OAuthState,
 	})
 
-	render(w, r, "golfer/settings", data, "Settings")
+	render(w, r, "golfer/settings", data, "Settings: General")
 }
 
-// POST /golfer/settings/{page}
-func golferSettingsPagePOST(w http.ResponseWriter, r *http.Request) {
+// GET /golfer/settings/export-data
+func golferSettingsExportDataGET(w http.ResponseWriter, r *http.Request) {
+	render(w, r, "golfer/settings", nil, "Settings: Export Data")
+}
+
+// GET /golfer/settings/export-data
+func golferSettingsDeleteAccountGET(w http.ResponseWriter, r *http.Request) {
+	render(w, r, "golfer/settings", nil, "Settings: Delete Account")
+}
+
+// POST /golfer/settings/save
+func golferSettingsSavePOST(w http.ResponseWriter, r *http.Request) {
 	golfer := session.Golfer(r)
-	page := param(r, "page")
+	page := r.FormValue("page")
 
 	// If the posted value is valid, update the golfer's settings map.
 	for _, setting := range config.Settings[page] {
@@ -80,11 +90,11 @@ func golferSettingsPagePOST(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, r.FormValue("path"), http.StatusFound)
 }
 
-// POST /golfer/settings/{page}/reset
-func golferSettingsPageResetPOST(w http.ResponseWriter, r *http.Request) {
+// POST /golfer/settings/reset
+func golferSettingsResetPOST(w http.ResponseWriter, r *http.Request) {
 	golfer := session.Golfer(r)
 
-	delete(golfer.Settings, param(r, "page"))
+	delete(golfer.Settings, r.FormValue("page"))
 
 	golfer.SaveSettings(session.Database(r))
 

@@ -1,11 +1,6 @@
 /* TODO Stop having "thin" pages, make everything consistent. */
 body { max-width: 60rem }
 
-body > h1 {
-    border-bottom: 2px solid var(--color);
-    padding: 1rem;
-}
-
 table { width: 100% }
 
 .flag { margin-right: .5rem }
@@ -18,11 +13,24 @@ table { width: 100% }
     gap: 1rem;
     grid-template-columns: repeat(2, 1fr);
 
-    > div {
+    > a:hover {
+        background: var(--color);
+        color: var(--background);
+        text-decoration: none;
+    }
+
+    > :is(a, div) {
         border: 2px solid var(--color);
+        color: var(--color);
         display: grid;
         gap: .5rem;
         padding: 1rem;
+
+        > :is(h2, span) {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
     }
 }
 

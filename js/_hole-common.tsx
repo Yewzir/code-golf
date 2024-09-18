@@ -6,28 +6,38 @@ import LZString                                from 'lz-string';
 
 let tabLayout: boolean = false;
 
-const langWikiCache: Record<string, string> = {};
+const langWikiCache: Record<string, string | null> = {};
 async function getLangWikiContent(lang: string): Promise<string> {
-    if (!(lang in langWikiCache)){
-        const resp  = await fetch(`/api/wiki/langs/${lang}`, { method: 'GET' });
+    if (!(lang in langWikiCache)) {
+        const resp  = await fetch(`/api/wiki/langs/${lang}`);
         langWikiCache[lang] = resp.status === 200 ? (await resp.json()).content : null;
     }
     return langWikiCache[lang] ?? 'No data for current lang.';
 }
 
+const holeLangNotesCache: Record<string, string | null> = {};
+async function getHoleLangNotesContent(lang: string): Promise<string> {
+    if (!(lang in holeLangNotesCache)) {
+        const resp  = await fetch(`/api/notes/${hole}/${lang}`);
+        holeLangNotesCache[lang] = resp.status === 200 ? (await resp.text()) : null;
+    }
+    return holeLangNotesCache[lang] ?? '';
+}
+
 const renamedHoles: Record<string, string> = {
-    'eight-queens': 'n-queens',
-    'eight-queens-formatted': 'n-queens-formatted',
+    'billiard':                      'billiards',
+    'eight-queens':                  'n-queens',
     'factorial-factorisation-ascii': 'factorial-factorisation',
-    'grid-packing': 'css-grid',
+    'grid-packing':                  'css-grid',
+};
+
+const renamedLangs: Record<string, string> = {
+    perl6: 'raku',
 };
 
 export function init(_tabLayout: boolean, setSolution: any, setCodeForLangAndSolution: any, updateReadonlyPanels: any, getEditor: () => any) {
     tabLayout = _tabLayout;
     const closuredSubmit = () => submit(getEditor(), updateReadonlyPanels);
-    window.onkeydown = e => (e.ctrlKey || e.metaKey) && e.key == 'Enter'
-        ? closuredSubmit()
-        : undefined;
     if (vimMode) Vim.defineEx('write', 'w', closuredSubmit);
 
     (onhashchange = async () => {
@@ -45,14 +55,13 @@ export function init(_tabLayout: boolean, setSolution: any, setCodeForLangAndSol
         history.replaceState(null, '', '#' + lang);
 
         const editor = getEditor();
-        if (tabLayout) {
-            $('#hole-lang summary').innerText = langs[lang].name;
-            refreshScores(editor);
-        }
+        if (tabLayout) refreshScores(editor);
         setCodeForLangAndSolution(editor);
 
-        if (tabLayout)
+        if (tabLayout) {
             updateReadonlyPanels({langWiki: await getLangWikiContent(lang)});
+            updateReadonlyPanels({holeLangNotes: await getHoleLangNotesContent(lang)});
+        }
     })();
 
     $('dialog [name=text]').addEventListener('input', (e: Event) => {
@@ -63,9 +72,14 @@ export function init(_tabLayout: boolean, setSolution: any, setCodeForLangAndSol
 
     for (const [key, value] of Object.entries(localStorage)) {
         if (key.startsWith('code_')) {
-            const hole = key.split('_')[1];
-            if (hole in renamedHoles) {
-                localStorage.setItem(key.replace(hole, renamedHoles[hole]), value);
+            const [prefix, hole, lang, scoring] = key.split('_');
+
+            const newHole = renamedHoles[hole] ?? hole;
+            const newLang = renamedLangs[lang] ?? lang;
+
+            const newKey = [prefix, newHole, newLang, scoring].join('_');
+            if (key !== newKey) {
+                localStorage.setItem(newKey, value);
                 localStorage.removeItem(key);
             }
         }
@@ -226,11 +240,14 @@ function updateLangPicker() {
     }
 
     // Hybrid language selector: make it easy to see your existing solutions and their lengths.
-    $('#picker').replaceChildren(...sortedLangs.map((l: any) => {
-        const tab = <a href={l.id == lang ? null : '#'+l.id}>{l.name}</a>;
+    const picker = $('#picker');
+    const icon   = picker.dataset.style?.includes('icon')  ?? true;
+    const label  = picker.dataset.style?.includes('label') ?? true;
+    picker.replaceChildren(...sortedLangs.map((l: any) => {
+        const tab = <a href={l.id == lang ? null : '#'+l.id} title={l.name}></a>;
 
-        if (l.experiment)
-            tab.prepend(<svg><use href="#flask"/></svg>);
+        if (icon)  tab.append(<svg><use href={'#'+l.id}/></svg>);
+        if (label) tab.append(l.name);
 
         if (getSolutionCode(l.id, 0)) {
             const bytes = byteLen(getSolutionCode(l.id, 0));
@@ -239,12 +256,14 @@ function updateLangPicker() {
             let text = comma(bytes);
             if (chars && bytes != chars) text += '/' + comma(chars);
 
-            tab.append(' ', <sup>{text}</sup>);
+            tab.append(<sup>{text}</sup>);
         }
         else if (!localStorage.getItem(getAutoSaveKey(l.id, 0)) &&
                  !localStorage.getItem(getAutoSaveKey(l.id, 1))) {
             return null;
         }
+
+        if (l.experiment) tab.append(<svg><use href="#flask"/></svg>);
 
         return tab;
     }).filter((x: Node | null) => x), ...selectNodes);
@@ -334,13 +353,15 @@ export interface RankUpdate {
 
 export interface Run {
     answer: string,
+    multiset_delimiter: string,
+    item_delimiter: string,
     args: string[],
     exit_code: number,
     pass: boolean,
     stderr: string,
     stdout: string,
     time_ns: number,
-    timeout: boolean
+    timeout: boolean,
 }
 
 export interface ReadonlyPanelsData {
@@ -349,6 +370,8 @@ export interface ReadonlyPanelsData {
     Exp: string,
     Err: string,
     Argv: string[],
+    MultisetDelimiter: string,
+    ItemDelimiter: string
 }
 
 export interface SubmitResponse {
@@ -504,17 +527,23 @@ const diamondPopups = (updates: RankUpdate[]) => {
     return popups;
 };
 
+let lastSubmittedCode = '';
+export function getLastSubmittedCode(){
+    return lastSubmittedCode;
+}
+
 export async function submit(
     editor: any,
     // eslint-disable-next-line no-unused-vars
     updateReadonlyPanels: (d: ReadonlyPanelsData) => void,
-) {
-    if (!editor) return;
+): Promise<boolean> {
+    if (!editor) return false;
     $('h2').innerText = '…';
     $('#status').className = 'grey';
     $$('canvas').forEach(e => e.remove());
 
     const code = editor.state.doc.toString();
+    lastSubmittedCode = code;
     const codeLang = lang;
     const submissionID = ++latestSubmissionID;
 
@@ -525,16 +554,20 @@ export async function submit(
 
     if (res.status != 200) {
         alert('Error ' + res.status);
-        return;
+        return false;
     }
 
     const data = await res.json() as SubmitResponse;
     savedInDB = data.logged_in && !experimental;
 
     if (submissionID != latestSubmissionID)
-        return;
+        return false;
 
     const pass = data.runs.every(r => r.pass);
+    $('main')?.classList.remove('pass');
+    $('main')?.classList.remove('fail');
+    $('main')?.classList.add(pass ? 'pass' : 'fail');
+    $('main')?.classList.add('lastSubmittedCode');
     if (pass) {
         for (const i of [0, 1] as const) {
             const solutionCode = getSolutionCode(codeLang, i);
@@ -591,6 +624,8 @@ export async function submit(
             Exp: run.answer,
             Err: run.stderr,
             Out: run.stdout,
+            MultisetDelimiter: run.multiset_delimiter,
+            ItemDelimiter: run.item_delimiter,
         });
 
         const ms = Math.round(run.time_ns / 10**6);
@@ -656,6 +691,8 @@ export async function submit(
         </div>));
 
     refreshScores(editor);
+
+    return pass;
 }
 
 export function updateLocalStorage(code: string) {
@@ -841,4 +878,12 @@ function replacePlaceholdersInRange(selection: Selection, range: Range) {
     }
 
     return text;
+}
+
+export function ctrlEnter(func: Function) {
+    return function (e: KeyboardEvent) {
+        if ((e.ctrlKey || e.metaKey) && e.key == 'Enter') {
+            return func();
+        }
+    };
 }
