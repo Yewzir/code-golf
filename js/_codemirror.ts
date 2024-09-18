@@ -157,6 +157,7 @@ export const extensions : { [key: string]: any } = {
     'jq':            jq(),
     'julia':         StreamLanguage.define(julia),
     'k':             k(),
+    // TODO kotlin
     'lisp':          StreamLanguage.define(commonLisp),
     'lua':           StreamLanguage.define(lua),
     'nim':           StreamLanguage.define({ ...nim( {}, {} ), languageData: { commentTokens: { line: '#' } } }),
