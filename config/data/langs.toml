@@ -958,11 +958,11 @@ example = '''
 '''
 
 [Kotlin]
-args       = [ '/usr/local/bin/kotlin', '-e', '$code' ]
-env        = [ 'JAVA_HOME=/opt/java/openjdk' ]
+args       = [ '/usr/bin/kotlin', '-e', '$code' ]
+env        = [ 'JAVA_HOME=/opt/jdk' ]
 experiment = 151
-size       = '0 MiB'
-version    = '2.0.20'
+size       = '272 MiB'
+version    = '2.0.21'
 website    = 'https://kotlinlang.org'
 example    = '''
 // Printing

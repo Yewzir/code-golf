@@ -13,6 +13,7 @@ RUN apk add --no-cache build-base curl git linux-headers tzdata \
 #COPY --from=codegolf/lang-d            ["/", "/langs/d/rootfs/"           ] #  309 MiB
 #COPY --from=codegolf/lang-zig          ["/", "/langs/zig/rootfs/"         ] #  300 MiB
 #COPY --from=codegolf/lang-julia        ["/", "/langs/julia/rootfs/"       ] #  297 MiB
+COPY --from=codegolf/lang-kotlin       ["/", "/langs/kotlin/rootfs/"      ] #  272 MiB
 #COPY --from=codegolf/lang-crystal      ["/", "/langs/crystal/rootfs/"     ] #  270 MiB
 #COPY --from=codegolf/lang-odin         ["/", "/langs/odin/rootfs/"        ] #  258 MiB
 #COPY --from=codegolf/lang-dart         ["/", "/langs/dart/rootfs/"        ] #  235 MiB
@@ -79,7 +80,6 @@ RUN apk add --no-cache build-base curl git linux-headers tzdata \
 #COPY --from=codegolf/lang-lua          ["/", "/langs/lua/rootfs/"         ] #  354 KiB
 #COPY --from=codegolf/lang-sed          ["/", "/langs/sed/rootfs/"         ] #  236 KiB
 #COPY --from=codegolf/lang-brainfuck    ["/", "/langs/brainfuck/rootfs/"   ] # 51.2 KiB
-COPY --from=codegolf/lang-kotlin       ["/", "/langs/kotlin/rootfs/"      ] #    0 MiB
 
 COPY run-lang.c ./
 
