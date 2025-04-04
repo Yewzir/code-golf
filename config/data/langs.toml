@@ -369,7 +369,7 @@ foreach (String arg in args)
 ['C++']
 args    = [ '/usr/bin/cpp', '-' ]
 size    = '152 MiB'
-version = 'Clang 20.1.1'
+version = 'Clang 20.1.2'
 website = 'https://clang.llvm.org'
 example = '''
 #include <iostream>
@@ -780,7 +780,7 @@ end
 [Gleam]
 args    = [ '/usr/bin/gleam', '-', '--' ]
 env     = [ 'LANG=C.UTF-8' ]
-size    = '91.6 MiB'
+size    = '91.5 MiB'
 version = '1.9.1'
 website = 'https://gleam.run'
 example = '''
@@ -992,7 +992,7 @@ example = '''
 [Hush]
 args       = [ '/usr/bin/hush', '-' ]
 experiment = 656
-size       = '3.35 MiB'
+size       = '3.37 MiB'
 version    = '0.1.4'
 website    = 'https://hush-shell.github.io'
 example    = '''
@@ -1104,8 +1104,8 @@ class Main {
 
 [JavaScript]
 args    = [ '/usr/bin/javascript', '-e', '$code', '--' ]
-size    = '43.2 MiB'
-version = 'V8 13.4.114.21'
+size    = '43.9 MiB'
+version = 'V8 13.5.212.10'
 website = 'https://v8.dev'
 example = '''
 // Printing
@@ -1255,8 +1255,8 @@ Sys.argv
 [Odin]
 args       = [ '/usr/bin/odinwrapper', '-', '--' ]
 experiment = 766
-size       = '280 MiB'
-version    = '2025-03'
+size       = '281 MiB'
+version    = '2025-04'
 website    = 'https://odin-lang.org'
 example    = '''
 package main
@@ -1591,8 +1591,8 @@ end
 
 [Rust]
 args    = [ '/usr/bin/rust', '-' ]
-size    = '355 MiB'
-version = '1.85.1'
+size    = '379 MiB'
+version = '1.86.0'
 website = 'https://www.rust-lang.org'
 example = '''
 fn main() {
@@ -1739,9 +1739,8 @@ Lm
 
 [Swift]
 args    = [ '/usr/bin/swift', '-module-cache-path', '/tmp', '-' ]
-env     = [ 'PATH=/usr/bin:/bin' ]
-size    = '516 MiB'
-version = '6.0.3'
+size    = '543 MiB'
+version = '6.1'
 website = 'https://swift.org'
 example = '''
 // Printing
@@ -1805,8 +1804,8 @@ Hello, World!
 [Uiua]
 args       = [ '/usr/bin/uiua', 'eval', '--', '$code' ]
 experiment = 1115
-size       = '30.4 MiB'
-version    = '0.14.1'
+size       = '29.9 MiB'
+version    = '0.16.0'
 website    = 'https://www.uiua.org'
 example    = '''
 # Printing
