@@ -1,8 +1,8 @@
-FROM alpine:3.21 AS builder
+FROM alpine:3.22 AS builder
 
-RUN apk add --no-cache dash gcc ghc musl-dev
+RUN apk add --no-cache dash gcc musl-dev
 
-ENV BIN='/usr/local/bin/iogii' VER=1.0
+ENV BIN='/usr/local/bin/iogii' VER=1.0.1
 
 RUN wget -qO $BIN https://golfscript.com/iogii/iogii-$VER \
  && chmod +x $BIN
@@ -15,8 +15,7 @@ FROM codegolf/lang-ruby
 
 COPY --from=0 /usr/bin/dash        /bin/sh
 COPY --from=0 /usr/bin/env         \
-              /usr/bin/iogii       \
-              /usr/bin/runghc      /usr/bin/
+              /usr/bin/iogii       /usr/bin/
 COPY --from=0 /usr/local/bin/iogii /usr/local/bin/
 
 FROM codegolf/lang-haskell

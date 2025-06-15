@@ -7,7 +7,7 @@
 
 #define ERR_AND_EXIT(msg) do { perror(msg); exit(EXIT_FAILURE); } while (0)
 
-const char* iogii = "/usr/local/bin/iogii", *haskell = "/usr/bin/runghc", *code[] = {"code.iog", "code.hs"};
+const char* iogii = "/usr/local/bin/iogii", *haskell = "/usr/local/bin/runghc", *code[] = {"code.iog", "code.hs"};
 
 int main(int argc, char* argv[]) {
     if (!strcmp(argv[1], "--version")) {
@@ -61,12 +61,13 @@ int main(int argc, char* argv[]) {
     if (remove(code[0]))
         ERR_AND_EXIT("remove");
 
-    int iargc = argc + 2;
+    int iargc = argc + 3;
     char** iargv = malloc(iargc * sizeof(char*));
     iargv[0] = (char*) haskell;
     iargv[1] = "-w";
-    iargv[2] = (char*) code[1];
-    memcpy(&iargv[3], &argv[2], (argc - 2) * sizeof(char*));
+    iargv[2] = "--ghc-arg=-fdiagnostics-color=always";
+    iargv[3] = (char*) code[1];
+    memcpy(&iargv[4], &argv[2], (argc - 2) * sizeof(char*));
     iargv[iargc - 1] = NULL;
 
     execv(haskell, iargv);
