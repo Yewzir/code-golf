@@ -1,8 +1,8 @@
 FROM alpine:3.22 AS builder
 
-RUN apk add --no-cache build-base curl
+RUN apk add --no-cache curl gcc make musl-dev
 
-ENV VER=5.4.7
+ENV VER=5.4.8
 
 # Also rebuild Fennel.
 RUN curl -#L https://www.lua.org/ftp/lua-$VER.tar.gz \
