@@ -28,12 +28,12 @@ RUN rm -r /usr/lib/ghc-$VER/lib/bin                           \
 
 FROM codegolf/lang-base
 
-COPY --from=0 /usr/bin/dash            /bin/sh
-COPY --from=0 /lib/ld-musl-x86_64.so.1 /lib/
-COPY --from=0 /usr/bin/cc              \
-              /usr/bin/ghc             \
-              /usr/bin/haskell         /usr/bin/
-COPY --from=0 /usr/lib                 /usr/lib
+COPY --from=0 /usr/bin/dash       /bin/sh
+COPY --from=0 /lib/ld-musl-*.so.1 /lib/
+COPY --from=0 /usr/bin/cc         \
+              /usr/bin/ghc        \
+              /usr/bin/haskell    /usr/bin/
+COPY --from=0 /usr/lib            /usr/lib
 
 ENTRYPOINT ["haskell"]
 
