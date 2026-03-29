@@ -205,7 +205,7 @@ CREATE UNLOGGED TABLE holes (
 CREATE UNLOGGED TABLE langs (
     id           lang   NOT NULL PRIMARY KEY,
     experiment   int    NOT NULL,
-    digest_trunc bytea  NOT NULL,
+    digest_trunc bytea  NULL,
     name         citext NOT NULL
 );
 

@@ -124,14 +124,4 @@ for %langs{@langs}:p -> (:key($name), :value(%lang)) {
 
 spurt 'config/data/langs.toml', to-toml %langs;
 
-# Reorder Dockerfiles: largest first to speed-up partial deploys.
-my $layers;
-$layers ~= sprintf(
-    q:b[COPY --from=codegolf/lang-%-*s / /langs/%2$s/rootfs/\n],
-    $ //= %langs.keys».&id».chars.max, id(.key),
-) for %langs.sort: { so .value<size> ~~ /K/, -.value<size>.split(" ")[0], id(.key) };
-
-.spurt: .slurp.subst: / ( 'COPY --from=codegolf' \N+ \n )+ /, $layers
-    for <docker/dev.Dockerfile docker/live.Dockerfile>».IO;
-
 sub id { $^name.lc.subst(' ', '-').trans: qw[# + ><>] => qw[-sharp p fish] }
