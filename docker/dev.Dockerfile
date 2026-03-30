@@ -7,6 +7,7 @@ RUN apk add --no-cache build-base curl git linux-headers tzdata \
  && GOBIN=/bin go install github.com/cespare/reflex@latest
 
 COPY --from=codegolf/lang-cpp          / /langs/cpp/rootfs/
+COPY --from=codegolf/lang-javascript   / /langs/javascript/rootfs/
 
 COPY cmd/hash-langs ./cmd/hash-langs
 
